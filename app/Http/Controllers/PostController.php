@@ -10,52 +10,69 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::all();
-        return view('posts', ['posts' => $posts]);
+        return view('post.index', ['posts' => $posts]);
     }
 
 
     public function create()
     {
-        $posts = Post::all();
-        foreach ($posts as $post) {
-            Post::create([
-                'title' => $post->id . " title",
-                'content' => $post->id . " content",
-                'image' => $post->id . "image",
-                'likes' => $post->id . "0",
-                'is_published' => 1,
-            ]);
-        }
+        return view('post.create');
     }
 
-    public function update()
-    {
-        $posts = Post::all();
-        foreach ($posts as $post) {
-            $post->update([
-                'title' => $post->id . " title",
-                'content' => $post->id . " content",
-                'image' => $post->id . "image",
-                'likes' => $post->id . "0",
-            ]);
-            if ($post->id % 3 == 0) {
-                $post->update([
-                    'is_published' => 0,
-                ]);
-            } else {
-                $post->update([
-                    'is_published' => 1,
-                ]);
-            }
-        }
+    public function store(Request $request) {
+        $data = $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+            'image' => 'required'
+        ]);
+
+        $postModel = new Post;
+        $postModel->title = $request->input('title');
+        $postModel->content = $request->input('content');
+        $postModel->image = $request->input('image');
+        $postModel->save();
+
+
+        return redirect()->route('post.index');
     }
 
-    public function delete()
-    {
-        $posts = Post::withTrashed()->where('id', '>', 0);
-        $posts->restore();
-        // $posts = Post::truncate();
+
+    public function show($id) {
+        $post = Post::findOrFail($id);
+        return view('post.show', ['post' => $post]);
     }
+
+
+    public function edit($id) {
+        $post = Post::findOrFail($id);
+        return view('post.edit', ['post' => $post]);
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $data = $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+            'image' => 'required',
+        ]);
+
+        $post = Post::find($id);
+        $post->title = $request->input('title');
+        $post->content = $request->input('content');
+        $post->image = $request->input('image');
+        $post->save();
+
+        return redirect()->route("post.show", $id);
+    }
+
+    public function destroy($id)
+    {
+        $posts = Post::find($id);
+        $posts->delete();
+        return redirect()->route('post.index');
+    }
+
 
     public function firstOrCreate()
     {
