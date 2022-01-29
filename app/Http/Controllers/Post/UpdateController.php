@@ -9,18 +9,15 @@ use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
-class UpdateController extends Controller
+class UpdateController extends BaseController
 {
     public function __invoke(UpdateRequest $request, $id)
     {
         $post = Post::find($id);
         $data = $request->validated();
 
-        $tags = $data['tags'];
-        unset($data['tags']);
+        $this->service->update($post, $data);
 
-        $post->update($data);
-        $post->tags()->sync($tags);
         return redirect()->route("post.show", $id);
     }
 }
