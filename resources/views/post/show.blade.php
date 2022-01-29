@@ -5,9 +5,11 @@
 
 
 <div>
-    <h2>{{ $post->id }}. {{ $post->title }}</h2>
-    <h3>{{$post->content}}</h3>
-    <h3>{{$post->image}}</h3>
+    <h2>№{{$post->id}}.</h2>
+    <h3>title - {{ $post->title }}</h3>
+    <h3>content - {{$post->content}}</h3>
+    <h3>image - {{$post->image}}</h3>
+    <h3>category - {{$post->category->title}}</h3>
 </div>
 <div>
     <a href="{{route('post.edit', $post->id)}}" class="btn btn-warning">Edit</a>

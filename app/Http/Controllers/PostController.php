@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\PostTag;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
@@ -11,63 +12,69 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::find(3);
-        $tag = Tag::find(1);
-        dd($tag->posts);
-
-        // return view('post.index', ['posts' => $posts]);
+        $posts = Post::all();
+        return view('post.index', ['posts' => $posts]);
     }
 
 
     public function create()
     {
-        return view('post.create');
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('post.create', ['categories' => $categories, 'tags' => $tags]);
     }
 
-    public function store(Request $request) {
-        $data = $request->validate([
-            'title' => 'required',
-            'content' => 'required',
-            'image' => 'required'
-        ]);
-
-        $postModel = new Post;
-        $postModel->title = $request->input('title');
-        $postModel->content = $request->input('content');
-        $postModel->image = $request->input('image');
-        $postModel->save();
-
-
-        return redirect()->route('post.index');
-    }
-
-
-    public function show($id) {
-        $post = Post::findOrFail($id);
-        return view('post.show', ['post' => $post]);
-    }
-
-
-    public function edit($id) {
-        $post = Post::findOrFail($id);
-        return view('post.edit', ['post' => $post]);
-    }
-
-
-    public function update(Request $request, $id)
+    public function store(Request $request)
     {
         $data = $request->validate([
             'title' => 'required',
             'content' => 'required',
             'image' => 'required',
+            'category_id' => 'required',
+            'tags' => '',
         ]);
 
-        $post = Post::find($id);
-        $post->title = $request->input('title');
-        $post->content = $request->input('content');
-        $post->image = $request->input('image');
-        $post->save();
+        $tags = $data['tags'];
+        unset($data['tags']);
 
+        $post = Post::create($data);
+
+        return redirect()->route('post.index');
+    }
+
+
+    public function show($id)
+    {
+        $post = Post::findOrFail($id);
+        return view('post.show', ['post' => $post]);
+    }
+
+
+    public function edit($id)
+    {
+        $post = Post::find($id);
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('post.edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags]);
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $post = Post::find($id);
+        $data = $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+            'image' => 'required',
+            'category_id' => 'required',
+            'tags' => '',
+        ]);
+
+        $tags = $data['tags'];
+        unset($data['tags']);
+
+        $post->update($data);
+        $post->tags()->sync($tags);
         return redirect()->route("post.show", $id);
     }
 
@@ -98,7 +105,7 @@ class PostController extends Controller
     {
         $post = Post::updateOrCreate([
             'id' => 33,
-        ],[
+        ], [
             'title' => "33 title",
             'content' => "33 content",
             'image' => "33image",
