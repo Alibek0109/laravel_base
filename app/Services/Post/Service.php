@@ -13,6 +13,7 @@ class Service {
         $post->tags()->attach($tags);
     }
 
+    
     public function update($post, $data) {
         $tags = $data['tags'];
         unset($data['tags']);
