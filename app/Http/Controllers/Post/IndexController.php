@@ -8,7 +8,7 @@ use App\Http\Requests\Post\FilterRequest;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
-use Illuminate\Http\Request;
+
 
 class IndexController extends BaseController
 {

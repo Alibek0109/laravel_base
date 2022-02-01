@@ -26,9 +26,7 @@ class FilterRequest extends FormRequest
         return [
             'title' => 'string',
             'content' => 'string',
-
             'category_id' => '',
-           
         ];
     }
 }
